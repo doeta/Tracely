@@ -71,9 +71,14 @@ def normalize_event_log(data: pd.DataFrame) -> pd.DataFrame:
     for column in ("case_id", "activity"):
         normalized[column] = normalized[column].astype("string").str.strip()
 
-    normalized["timestamp"] = pd.to_datetime(
-        normalized["timestamp"], errors="coerce", utc=True
-    )
+    try:
+        normalized["timestamp"] = pd.to_datetime(
+            normalized["timestamp"], format="mixed", errors="coerce", utc=True
+        )
+    except (TypeError, ValueError):
+        normalized["timestamp"] = pd.to_datetime(
+            normalized["timestamp"], errors="coerce", utc=True
+        )
 
     invalid_counts = {
         "case_id": int((normalized["case_id"].isna() | normalized["case_id"].eq("")).sum()),
