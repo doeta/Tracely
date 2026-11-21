@@ -42,9 +42,9 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from bpic17_analyzer.analysis import get_case_events
-from bpic17_analyzer.models import AnalysisResult, DatasetOverview, FastSlowComparison
-from bpic17_analyzer.service import AnalysisService
+from tracely.analysis import get_case_events
+from tracely.models import AnalysisResult, DatasetOverview, FastSlowComparison
+from tracely.service import AnalysisService
 from .dfg_canvas import DfgInteractiveCanvas
 from .theme import (
     BTN_HEIGHT_COMPACT,

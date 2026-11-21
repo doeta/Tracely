@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pandas as pd
 
-from bpic17_analyzer.analysis import analyze_exercise_1122
-from bpic17_analyzer.event_log import normalize_event_log
+from tracely.analysis import analyze_exercise_1122
+from tracely.event_log import normalize_event_log
 
 
 def test_1122_detects_eventually_follows_not_only_adjacent(sample_log):

@@ -3,8 +3,8 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from bpic17_analyzer.event_log import normalize_event_log
-from bpic17_analyzer.exceptions import DatasetValidationError
+from tracely.event_log import normalize_event_log
+from tracely.exceptions import DatasetValidationError
 
 
 def test_normalize_maps_xes_columns_and_sorts_stably():

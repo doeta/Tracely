@@ -158,7 +158,7 @@ pre {{ background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 6px; font-
 </style>
 </head>
 <body>
-<h1>Laporan Analisis Event Log — BPIC17 Process Analyzer</h1>
+<h1>Laporan Analisis Event Log — Tracely Process Intelligence</h1>
 {overview_section}
 <h2>2. Ringkasan Hasil Analisis</h2>
 <table>

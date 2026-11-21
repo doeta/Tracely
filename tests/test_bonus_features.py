@@ -8,13 +8,13 @@ import pytest
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
-from bpic17_analyzer.analysis import (
+from tracely.analysis import (
     analyze_fast_slow_cases,
     build_simple_dfg,
     run_generic_filter,
 )
-from bpic17_analyzer.event_log import normalize_event_log
-from bpic17_analyzer.exporter import export_results_pdf
+from tracely.event_log import normalize_event_log
+from tracely.exporter import export_results_pdf
 
 
 def test_fast_slow_cases_analysis_splits_and_compares():
@@ -90,7 +90,7 @@ def test_simple_dfg_counts_adjacent_pairs_without_process_discovery(sample_log):
 
 
 def test_export_results_pdf_writes_valid_pdf_file(sample_log, tmp_path):
-    from bpic17_analyzer.service import AnalysisService
+    from tracely.service import AnalysisService
 
     svc = AnalysisService()
     svc.set_dataframe_for_testing(sample_log)
@@ -111,7 +111,7 @@ def test_export_results_pdf_writes_valid_pdf_file(sample_log, tmp_path):
 
 def test_general_purpose_non_bpic17_event_log_analysis():
     """Verify the engine works on any non-BPIC17 XES event log (e.g. e-commerce / hospital)."""
-    from bpic17_analyzer.analysis import (
+    from tracely.analysis import (
         analyze_exercise_117,
         analyze_exercise_1115,
         analyze_exercise_1118,

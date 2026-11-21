@@ -3,7 +3,7 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from bpic17_analyzer.event_log import normalize_event_log
+from tracely.event_log import normalize_event_log
 
 
 @pytest.fixture

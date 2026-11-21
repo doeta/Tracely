@@ -3,9 +3,9 @@ from __future__ import annotations
 import pandas as pd
 import pytest
 
-from bpic17_analyzer.analysis import analyze_exercise_1115, analyze_exercise_1118
-from bpic17_analyzer.event_log import normalize_event_log
-from bpic17_analyzer.exceptions import AnalysisPrerequisiteError
+from tracely.analysis import analyze_exercise_1115, analyze_exercise_1118
+from tracely.event_log import normalize_event_log
+from tracely.exceptions import AnalysisPrerequisiteError
 
 
 def test_1115_counts_only_complete_occurrences(sample_log):

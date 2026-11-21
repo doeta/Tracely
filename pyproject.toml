@@ -3,9 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "bpic17-process-analyzer"
+name = "tracely"
 version = "0.1.0"
-description = "Desktop application for BPIC17 event-log analysis using PM4Py and PySide6"
+description = "Desktop application for IEEE XES process mining and event-log intelligence using PM4Py and PySide6"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [

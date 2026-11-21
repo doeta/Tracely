@@ -70,7 +70,7 @@
 ```text
 Tracely/
 ├── app/                   # PySide6 desktop GUI & interactive DFG canvas
-├── src/bpic17_analyzer/   # Core PM4Py/Pandas analysis engine & exporters
+├── src/tracely/           # Core PM4Py/Pandas analysis engine & exporters
 ├── tests/                 # Automated unit & GUI integration tests
 ├── examples/              # Synthetic XES log for quick smoke testing
 ├── data/raw/              # Local XES datasets (ignored by Git)

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from bpic17_analyzer.service import AnalysisService
+from tracely.service import AnalysisService
 
 
 def test_service_runs_all_required_exercises(sample_log):

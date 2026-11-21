@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from bpic17_analyzer.analysis import analyze_exercise_117, cycle_time_by_case
+from tracely.analysis import analyze_exercise_117, cycle_time_by_case
 
 
 def test_cycle_time_uses_first_and_last_timestamp(sample_log):
@@ -34,7 +34,7 @@ def test_cancelled_event_must_be_the_last_event(sample_log):
 
 def test_117_contains_filters_count_a_case_once_even_when_activity_repeats():
     import pandas as pd
-    from bpic17_analyzer.event_log import normalize_event_log
+    from tracely.event_log import normalize_event_log
 
     source = pd.DataFrame({
         "case:concept:name": ["C1", "C1", "C1", "C1"],
@@ -53,7 +53,7 @@ def test_117_contains_filters_count_a_case_once_even_when_activity_repeats():
 
 def test_117_cycle_time_uses_full_original_trace_not_only_target_events():
     import pandas as pd
-    from bpic17_analyzer.event_log import normalize_event_log
+    from tracely.event_log import normalize_event_log
 
     # Case C1 starts at day 1 (A_Create), has O_Accepted on day 2, and ends on day 4 (W_Close).
     # Full trace duration must be 3.0 days, not 0.0 days (from O_Accepted alone).
@@ -73,7 +73,7 @@ def test_117_cycle_time_uses_full_original_trace_not_only_target_events():
 
 def test_117e_tie_breaker_preserves_source_order_when_timestamps_equal():
     import pandas as pd
-    from bpic17_analyzer.event_log import normalize_event_log
+    from tracely.event_log import normalize_event_log
 
     # C1 has O_Review then O_Cancelled at the exact same timestamp -> ends with O_Cancelled (qualifies)
     # C2 has O_Cancelled then O_Review at the exact same timestamp -> ends with O_Review (does not qualify)

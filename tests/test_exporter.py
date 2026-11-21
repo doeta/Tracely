@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import csv
 
-from bpic17_analyzer.analysis import analyze_exercise_1122, analyze_exercise_117
-from bpic17_analyzer.exporter import export_results_csv
+from tracely.analysis import analyze_exercise_1122, analyze_exercise_117
+from tracely.exporter import export_results_csv
 
 
 def test_export_writes_summary_and_case_evidence(sample_log, tmp_path):

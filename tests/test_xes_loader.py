@@ -6,8 +6,8 @@ import types
 import pandas as pd
 import pytest
 
-from bpic17_analyzer.exceptions import DatasetLoadError
-from bpic17_analyzer.xes_loader import read_xes_dataframe
+from tracely.exceptions import DatasetLoadError
+from tracely.xes_loader import read_xes_dataframe
 
 
 def test_xes_loader_calls_pm4py_and_normalizes_dataframe(tmp_path, monkeypatch):
