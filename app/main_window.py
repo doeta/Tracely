@@ -121,8 +121,6 @@ class MainWindow(QMainWindow):
     PAGE_SEQUENCE = 6
     PAGE_EXPLORER = 7
     PAGE_REPORTS = 8
-    PAGE_SETTINGS = 9
-    PAGE_ABOUT = 10
 
     # Compatibility aliases
     PAGE_DASHBOARD = PAGE_OVERVIEW
@@ -193,7 +191,7 @@ class MainWindow(QMainWindow):
         workspace_layout.setSpacing(12)
 
         self.pages = QStackedWidget()
-        self.pages.addWidget(self._build_overview_page())        # 0: Overview
+        self.pages.addWidget(self._build_overview_page())        # 0: Dashboard
         self.pages.addWidget(self._build_projects_page())        # 1: Projects
         self.pages.addWidget(self._build_event_logs_page())      # 2: Event Logs
         self.pages.addWidget(self._build_outcomes_page())        # 3: Process Outcomes
@@ -202,8 +200,6 @@ class MainWindow(QMainWindow):
         self.pages.addWidget(self._build_sequence_page())        # 6: Event Sequence
         self.pages.addWidget(self._build_case_explorer_page())   # 7: Case Explorer
         self.pages.addWidget(self._build_reports_page())         # 8: Reports & Export
-        self.pages.addWidget(self._build_settings_page())        # 9: Settings
-        self.pages.addWidget(self._build_about_page())           # 10: About
 
         workspace_layout.addWidget(self.pages, 1)
         self.main_splitter.addWidget(workspace_container)
@@ -213,6 +209,10 @@ class MainWindow(QMainWindow):
         self.main_splitter.setStretchFactor(0, 7)
         self.main_splitter.setStretchFactor(1, 3)
         self.main_splitter.setSizes([1020, 420])
+        # Start with Trace Inspector hidden on smaller screens so main workspace has full width
+        if self.width() < 1400:
+            self.context_panel.setVisible(False)
+            self.context_toggle_btn.setChecked(False)
 
         body_layout.addWidget(self.main_splitter, 1)
         root_layout.addWidget(body_frame, 1)
@@ -240,10 +240,7 @@ class MainWindow(QMainWindow):
         brand.setObjectName("BrandTitle")
         layout.addWidget(logo)
         layout.addWidget(brand)
-
-        self.breadcrumb_badge = make_ref_badge("WORKSPACE / OVERVIEW", COLOR_ACCENT)
-        layout.addWidget(self.breadcrumb_badge)
-        layout.addSpacing(4)
+        layout.addSpacing(8)
 
         self.dataset_label = QLabel("No Active Event Log")
         self.dataset_label.setFixedHeight(34)
@@ -272,22 +269,6 @@ class MainWindow(QMainWindow):
         self.export_pdf_button.setEnabled(False)
         layout.addWidget(self.export_pdf_button)
 
-        self.academic_toggle_btn = make_button(
-            "Academic Refs: ON",
-            variant="secondary",
-            tooltip="Show/Hide Academic Exercise Reference Codes (11.7, 11.15, 11.18, 11.22)",
-        )
-        self.academic_toggle_btn.setCheckable(True)
-        self.academic_toggle_btn.setChecked(True)
-        self.academic_toggle_btn.clicked.connect(self.toggle_academic_references)
-        layout.addWidget(self.academic_toggle_btn)
-
-        self.context_toggle_btn = make_button("Trace Inspector", variant="secondary")
-        self.context_toggle_btn.setCheckable(True)
-        self.context_toggle_btn.setChecked(True)
-        self.context_toggle_btn.clicked.connect(self.toggle_context_panel)
-        layout.addWidget(self.context_toggle_btn)
-
         return top_bar
 
     def _build_sidebar(self) -> QFrame:
@@ -302,7 +283,7 @@ class MainWindow(QMainWindow):
             (
                 "WORKSPACE",
                 [
-                    (self.PAGE_OVERVIEW, "■  Overview", "■"),
+                    (self.PAGE_OVERVIEW, "■  Dashboard", "■"),
                     (self.PAGE_PROJECTS, "◆  Projects", "◆"),
                     (self.PAGE_EVENT_LOGS, "▤  Event Logs", "▤"),
                 ],
@@ -321,13 +302,6 @@ class MainWindow(QMainWindow):
                 [
                     (self.PAGE_EXPLORER, "⌕  Case Explorer", "⌕"),
                     (self.PAGE_REPORTS, "⇪  Reports & Export", "⇪"),
-                ],
-            ),
-            (
-                "APPLICATION",
-                [
-                    (self.PAGE_SETTINGS, "⚙  Settings", "⚙"),
-                    (self.PAGE_ABOUT, "ⓘ  About", "ⓘ"),
                 ],
             ),
         ]
@@ -350,20 +324,12 @@ class MainWindow(QMainWindow):
 
         layout.addStretch(1)
 
-        self.sidebar_status_card = make_neubrutal_card(shadow_offset=2)
-        self.sidebar_status_card.setStyleSheet(
-            f"background-color: {COLOR_BG}; border: 2px solid {COLOR_BORDER}; border-radius: 7px;"
+        # Compact System Info trigger at sidebar footer (keeps Python/PM4Py version info accessible without an About tab)
+        self.about_button = make_button(
+            "ⓘ  System Info", variant="secondary", compact=True, tooltip="Show Python, PM4Py, Pandas & PySide6 versions"
         )
-        sb_layout = QVBoxLayout(self.sidebar_status_card)
-        sb_layout.setContentsMargins(10, 8, 10, 8)
-        sb_layout.setSpacing(2)
-        sb_title = QLabel("ENGINE STATUS")
-        sb_title.setStyleSheet("font-size: 10px; font-weight: 900;")
-        self.sidebar_engine_lbl = QLabel("PM4Py Engine • Idle")
-        self.sidebar_engine_lbl.setStyleSheet("font-size: 11px; font-weight: 700;")
-        sb_layout.addWidget(sb_title)
-        sb_layout.addWidget(self.sidebar_engine_lbl)
-        layout.addWidget(self.sidebar_status_card)
+        self.about_button.clicked.connect(self._show_about)
+        layout.addWidget(self.about_button)
 
         return sidebar
 
@@ -381,9 +347,12 @@ class MainWindow(QMainWindow):
         title = QLabel("TRACE INSPECTOR")
         title.setObjectName("SectionHeading")
         self.ctx_case_badge = make_ref_badge("NO CASE", COLOR_ACCENT)
+        close_ctx_btn = make_button("✕", variant="secondary", compact=True, fixed_width=34, tooltip="Hide Trace Inspector")
+        close_ctx_btn.clicked.connect(self.toggle_context_panel)
         hdr.addWidget(title)
         hdr.addStretch(1)
         hdr.addWidget(self.ctx_case_badge)
+        hdr.addWidget(close_ctx_btn)
         layout.addLayout(hdr)
 
         self.ctx_summary_label = QLabel(
@@ -449,7 +418,7 @@ class MainWindow(QMainWindow):
             self.sidebar_frame.setFixedWidth(SIDEBAR_WIDTH_COLLAPSED)
             for lbl in self.nav_section_labels:
                 lbl.setVisible(False)
-            self.sidebar_status_card.setVisible(False)
+            self.about_button.setText("ⓘ")
             for btn, (_, full_text, short_icon) in zip(self.nav_buttons, self._nav_specs):
                 btn.setText(short_icon)
                 btn.setToolTip(full_text)
@@ -458,7 +427,7 @@ class MainWindow(QMainWindow):
             self.sidebar_frame.setFixedWidth(SIDEBAR_WIDTH_EXPANDED)
             for lbl in self.nav_section_labels:
                 lbl.setVisible(True)
-            self.sidebar_status_card.setVisible(True)
+            self.about_button.setText("ⓘ  System Info")
             for btn, (_, full_text, _) in zip(self.nav_buttons, self._nav_specs):
                 btn.setText(full_text)
                 btn.setToolTip("")
@@ -468,64 +437,14 @@ class MainWindow(QMainWindow):
     def toggle_context_panel(self) -> None:
         visible = self.context_panel.isHidden()
         self.context_panel.setVisible(visible)
-        self.context_toggle_btn.setChecked(visible)
-
-    def toggle_academic_references(self) -> None:
-        self.show_academic_refs = self.academic_toggle_btn.isChecked()
-        self.academic_toggle_btn.setText(
-            "Academic Refs: ON" if self.show_academic_refs else "Academic Refs: OFF"
-        )
-        for badge in self.academic_badges:
-            badge.setVisible(self.show_academic_refs)
-        self.navigate_to(self.pages.currentIndex())
-        self._refresh_dashboard_table()
-        for key in ("11.7", "11.15", "11.18", "11.22"):
-            if key == "11.7":
-                items = [
-                    self.latest_results[c]
-                    for c in ("11.7A", "11.7B", "11.7C", "11.7D", "11.7E")
-                    if c in self.latest_results
-                ]
-                if items:
-                    self._on_analysis_finished("11.7", {i.code: i for i in items})
-            elif key in self.latest_results:
-                self._on_analysis_finished(key, self.latest_results[key])
+        if hasattr(self, "context_toggle_btn"):
+            self.context_toggle_btn.setChecked(visible)
 
     def navigate_to(self, page_index: int) -> None:
         if not (0 <= page_index < self.pages.count()):
             return
         self.pages.setCurrentIndex(page_index)
         self._refresh_nav_styles(page_index)
-
-        if self.show_academic_refs:
-            breadcrumbs = {
-                self.PAGE_OVERVIEW: "WORKSPACE / OVERVIEW",
-                self.PAGE_PROJECTS: "WORKSPACE / PROJECTS",
-                self.PAGE_EVENT_LOGS: "WORKSPACE / EVENT LOGS",
-                self.PAGE_OUTCOMES: "ANALYTICS / PROCESS OUTCOMES [EX 11.7 A–E & EX 11.10]",
-                self.PAGE_REWORK: "ANALYTICS / REWORK ANALYSIS [EX 11.15]",
-                self.PAGE_RESOURCE: "ANALYTICS / RESOURCE ANALYSIS [EX 11.18]",
-                self.PAGE_SEQUENCE: "ANALYTICS / EVENT SEQUENCE [EX 11.22]",
-                self.PAGE_EXPLORER: "DATA / CASE EXPLORER",
-                self.PAGE_REPORTS: "DATA / REPORTS & EXPORT",
-                self.PAGE_SETTINGS: "APPLICATION / SETTINGS",
-                self.PAGE_ABOUT: "APPLICATION / ABOUT",
-            }
-        else:
-            breadcrumbs = {
-                self.PAGE_OVERVIEW: "WORKSPACE / OVERVIEW",
-                self.PAGE_PROJECTS: "WORKSPACE / PROJECTS",
-                self.PAGE_EVENT_LOGS: "WORKSPACE / EVENT LOGS",
-                self.PAGE_OUTCOMES: "ANALYTICS / PROCESS OUTCOMES",
-                self.PAGE_REWORK: "ANALYTICS / REWORK ANALYSIS",
-                self.PAGE_RESOURCE: "ANALYTICS / RESOURCE ANALYSIS",
-                self.PAGE_SEQUENCE: "ANALYTICS / EVENT SEQUENCE",
-                self.PAGE_EXPLORER: "DATA / CASE EXPLORER",
-                self.PAGE_REPORTS: "DATA / REPORTS & EXPORT",
-                self.PAGE_SETTINGS: "APPLICATION / SETTINGS",
-                self.PAGE_ABOUT: "APPLICATION / ABOUT",
-            }
-        self.breadcrumb_badge.setText(breadcrumbs.get(page_index, "TRACELY WORKSPACE"))
 
     def _refresh_nav_styles(self, active_index: int) -> None:
         for btn, (idx, _, _) in zip(self.nav_buttons, self._nav_specs):
@@ -545,7 +464,7 @@ class MainWindow(QMainWindow):
 
         hdr = QHBoxLayout()
         title_col = QVBoxLayout()
-        t_lbl = QLabel("Overview Dashboard")
+        t_lbl = QLabel("Dashboard")
         t_lbl.setObjectName("PageTitle")
         s_lbl = QLabel(
             "Real-time Process Mining intelligence workspace. All metrics are computed dynamically from the active event log."
@@ -555,13 +474,18 @@ class MainWindow(QMainWindow):
         title_col.addWidget(s_lbl)
         hdr.addLayout(title_col, 1)
 
-        self.ov_import_btn = QPushButton("Import Event Log (.xes / .xes.gz)")
-        self.ov_import_btn.setObjectName("AccentButton")
+        self.context_toggle_btn = make_button("Trace Inspector", variant="secondary")
+        self.context_toggle_btn.setCheckable(True)
+        self.context_toggle_btn.setChecked(True)
+        self.context_toggle_btn.clicked.connect(self.toggle_context_panel)
+        hdr.addWidget(self.context_toggle_btn)
+
+        self.ov_import_btn = make_button("Import Event Log", variant="accent")
         apply_hard_shadow(self.ov_import_btn, 3, 3)
         self.ov_import_btn.clicked.connect(self._choose_xes)
         hdr.addWidget(self.ov_import_btn)
 
-        self.dash_run_all_btn = QPushButton("Run All Analyses")
+        self.dash_run_all_btn = make_button("Run All Analyses", variant="primary")
         apply_hard_shadow(self.dash_run_all_btn, 3, 3)
         self.dash_run_all_btn.clicked.connect(self._run_all_analyses)
         hdr.addWidget(self.dash_run_all_btn)
@@ -754,41 +678,16 @@ class MainWindow(QMainWindow):
 
         hdr = QHBoxLayout()
         title_col = QVBoxLayout()
-        t_lbl = QLabel("Event Logs — Import, Schema & Distribution")
+        t_lbl = QLabel("Event Logs — Schema Validation & Cycle Time Distribution")
         t_lbl.setObjectName("PageTitle")
         s_lbl = QLabel(
-            "IEEE XES event log ingestion via PM4Py, attribute schema verification, and case cycle time distribution."
+            "Verify IEEE XES attribute availability and inspect overall case cycle time distribution."
         )
         s_lbl.setObjectName("PageSubtitle")
         title_col.addWidget(t_lbl)
         title_col.addWidget(s_lbl)
         hdr.addLayout(title_col, 1)
-        hdr.addWidget(make_ref_badge("IEEE XES / PM4PY", COLOR_ACCENT))
         layout.addLayout(hdr)
-
-        import_card = make_neubrutal_card(shadow_offset=3)
-        imp_layout = QVBoxLayout(import_card)
-        imp_layout.setContentsMargins(14, 12, 14, 12)
-        imp_layout.setSpacing(8)
-
-        path_row = QHBoxLayout()
-        self.import_path_edit = QLineEdit()
-        self.import_path_edit.setReadOnly(True)
-        self.import_path_edit.setPlaceholderText("Select an IEEE .xes or .xes.gz event log file...")
-        browse_btn = QPushButton("Select & Load XES File...")
-        browse_btn.setObjectName("AccentButton")
-        browse_btn.clicked.connect(self._choose_xes)
-        path_row.addWidget(self.import_path_edit, 1)
-        path_row.addWidget(browse_btn)
-        imp_layout.addLayout(path_row)
-
-        self.import_details_label = QLabel(
-            "No dataset loaded. Core XES attributes: case:concept:name, concept:name, time:timestamp."
-        )
-        self.import_details_label.setWordWrap(True)
-        self.import_details_label.setStyleSheet("font-weight: 600;")
-        imp_layout.addWidget(self.import_details_label)
-        layout.addWidget(import_card)
 
         self.ov_cases_val = QLabel("—")
         self.ov_events_val = QLabel("—")
@@ -1923,7 +1822,6 @@ class MainWindow(QMainWindow):
         source_text = str(self.service.source_path) if self.service.source_path else "In-Memory DataFrame"
         short_name = self.service.source_path.name if self.service.source_path else "In-Memory Log"
         self.dataset_label.setText(f"ACTIVE LOG: {short_name} ({overview.total_cases:,} cases)")
-        self.import_path_edit.setText(source_text)
 
         mean_text = (
             f"{overview.mean_cycle_time_days:.4f} d"
@@ -1952,12 +1850,6 @@ class MainWindow(QMainWindow):
             f"ACTIVE EVENT LOG: {source_text}  •  "
             f"Time Span (UTC): {overview.first_timestamp or '-'} to {overview.last_timestamp or '-'}  •  "
             f"Optional Attributes: {attrs_str}"
-        )
-        self.import_details_label.setText(
-            f"Loaded: {source_text}\n"
-            f"Cases: {overview.total_cases:,} | Events: {overview.total_events:,} | "
-            f"Activities: {overview.unique_activities:,} | Mean Cycle Time: {mean_text}\n"
-            f"Time Range (UTC): {overview.first_timestamp or '-'} — {overview.last_timestamp or '-'}"
         )
         self.overview_label.setText(
             f"Time Range (UTC): {overview.first_timestamp or '-'} to {overview.last_timestamp or '-'}  |  "
@@ -2014,7 +1906,6 @@ class MainWindow(QMainWindow):
         except Exception:
             pass
         self._refresh_projects_table()
-        self.sidebar_engine_lbl.setText(f"Loaded • {overview.total_cases:,} cases")
         self._set_status_ready(
             f"Event log loaded ({overview.total_cases:,} cases, {overview.total_events:,} events)."
         )
@@ -2934,7 +2825,6 @@ class MainWindow(QMainWindow):
             "border-radius: 5px; padding: 2px 8px; font-size: 11px; font-weight: 900;"
         )
         self.status_label.setText(message)
-        self.sidebar_engine_lbl.setText("PM4Py Worker Busy...")
 
     def _set_status_ready(self, message: str) -> None:
         self.status_indicator_dot.setText("● READY")
