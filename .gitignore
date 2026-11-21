@@ -1,0 +1,90 @@
+# =====================================================================
+# Tracely — Python & Desktop Application .gitignore
+# =====================================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions & Distribution / Packaging
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Unit test / coverage reports & caches
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+
+# Virtual environments & local env variables
+.venv/
+venv/
+ENV/
+env/
+.env
+.env.*
+
+# IDEs & Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS metadata
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Event log datasets (large XES / compressed logs / XML metadata)
+data/*.xes
+data/*.xes.gz
+data/*.xml
+data/*.csv
+data/raw/*.xes
+data/raw/*.xes.gz
+data/raw/*.xml
+data/raw/*.csv
+!data/raw/README.md
+
+# AI agent instructions, internal docs & local reference materials
+AGENTS.md
+docs/
+refrensi/
+
+# Generated analysis exports (CSV & PDF reports)
+exports/*.csv
+exports/*.pdf
+exports/*.json
+!exports/README.md
