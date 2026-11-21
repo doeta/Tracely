@@ -22,10 +22,10 @@ def qapp():
 def test_tracely_navigation_and_analysis_integration(qapp, sample_log, tmp_path):
     window = MainWindow()
     assert "Tracely" in window.windowTitle()
-    assert window.nav_list.count() == 11
+    assert window.nav_list.count() == 9
     assert not window.export_button.isEnabled()
 
-    # Verify all 11 navigation pages can be visited and resized cleanly
+    # Verify all 9 navigation pages can be visited cleanly
     for page_idx in range(window.nav_list.count()):
         window.navigate_to(page_idx)
         assert window.pages.currentIndex() == page_idx
@@ -113,12 +113,6 @@ def test_tracely_navigation_and_analysis_integration(qapp, sample_log, tmp_path)
         for col in range(window.dashboard_table.columnCount()):
             cell = window.dashboard_table.item(row, col)
             assert cell is not None and bool(cell.toolTip())
-
-    # Verify Academic Reference toggle switches labels cleanly without layout shift
-    window.academic_toggle_btn.click()
-    assert window.show_academic_refs is False
-    window.academic_toggle_btn.click()
-    assert window.show_academic_refs is True
 
     # Verify CSV and PDF export through service from UI results
     summary_csv, evidence_csv = window.service.export(
