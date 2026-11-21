@@ -1,6 +1,6 @@
 # Tracely
 
-**Tracely** adalah aplikasi desktop **Process Mining & Event Log Intelligence** untuk menganalisis file event log standar IEEE XES (`.xes` / `.xes.gz`). Dibangun menggunakan **Python, PM4Py, Pandas, dan PySide6** dengan antarmuka desktop bergaya *Professional Neubrutalism*.
+**Tracely** adalah aplikasi desktop **Process Mining & Event Log Intelligence** untuk menganalisis file event log standar IEEE XES (`.xes` / `.xes.gz`). Dibangun menggunakan **Python, PM4Py, Pandas, dan PySide6** 
 
 ## Fitur Utama
 
